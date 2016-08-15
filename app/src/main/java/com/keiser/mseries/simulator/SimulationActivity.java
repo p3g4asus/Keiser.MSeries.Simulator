@@ -79,6 +79,8 @@ public class SimulationActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
                 simulatedData.gear = (byte) (seekBar.getProgress());
+                SeekBar rpmSeekBar = (SeekBar)findViewById(R.id.rpmSeekBar);
+                simulatedData.power = calculatePower(seekBar.getProgress(),rpmSeekBar.getProgress());
                 TextView gearTextView = (TextView) findViewById(R.id.gearTextView);
                 gearTextView.setText(String.valueOf(seekBar.getProgress()));
                 mAdvertiseCallback = null;
@@ -104,13 +106,18 @@ public class SimulationActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
-                simulatedData.rpm = convertRPMToBytes(seekBar.getProgress()+400);
+                simulatedData.rpm = convertIntToTwoBytes(seekBar.getProgress()+400);
+                SeekBar gearSeekBar = (SeekBar)findViewById(R.id.gearSeekBar);
+                simulatedData.power = calculatePower(gearSeekBar.getProgress(), seekBar.getProgress());
                 mAdvertiseCallback = null;
                 startAdvertising();
             }
         });
 
-        simulatedData = new MSeriesDataStructure(build, minor,bikeID,convertRPMToBytes(rpmSeekBar.getProgress()+400),(byte)gearSeekBar.getProgress());
+        int defaultRPM = rpmSeekBar.getProgress()+400;
+        int defaultGear = gearSeekBar.getProgress();
+
+        simulatedData = new MSeriesDataStructure(build, minor,bikeID,convertIntToTwoBytes(defaultRPM),(byte)defaultGear, calculatePower(defaultGear, defaultRPM));
 
         TextView buildNumberTextView = (TextView) findViewById(R.id.buildNumberTextView);
         buildNumberTextView.setText(buildString);
@@ -225,12 +232,20 @@ public class SimulationActivity extends AppCompatActivity {
         return new Intent(c, BLEAdvertiserService.class);
     }
 
-    private byte[] convertRPMToBytes(int currentRPM) {
+    private byte[] convertIntToTwoBytes(int value) {
         ByteBuffer bb = ByteBuffer.allocate(4);
-        bb.putInt(currentRPM);
+        bb.putInt(value);
         byte[] results = bb.array();
 
         return new byte[]{results[3], results[2]};
+    }
+
+    private byte[] calculatePower(int gear, int rpm) {
+        if (gear == 0) {
+            return convertIntToTwoBytes(0);
+        }
+        int power =(int)(25.0 * (double)gear * (1.0+((double)rpm / 800.0)));
+        return convertIntToTwoBytes(power);
     }
 
     private void startAdvertising() {
