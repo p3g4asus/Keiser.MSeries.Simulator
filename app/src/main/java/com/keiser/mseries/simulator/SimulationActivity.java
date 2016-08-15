@@ -7,6 +7,7 @@ import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.bluetooth.BluetoothAdapter;
@@ -14,6 +15,7 @@ import android.bluetooth.BluetoothManager;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 
@@ -148,27 +150,33 @@ public class SimulationActivity extends AppCompatActivity {
                     default:
                         errorMessage += " " + getString(R.string.start_error_unknown);
                 }
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
+
             }
         };
+
+        IntentFilter failureFilter = new IntentFilter(SimulationActivity.ADVERTISING_FAILED);
+        registerReceiver(advertisingFailureReceiver, failureFilter);
+
         if (savedInstanceState == null) {
             bluetoothAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
 
             if (bluetoothAdapter != null) {
                 if (bluetoothAdapter.isEnabled()) {
-                    if (bluetoothAdapter.isMultipleAdvertisementSupported()) {
                         bluetoothAdapter.setName(Constants.LOCAL_NAME);
                         initialize();
-                    }
                 } else {
                     Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBluetoothIntent, Constants.REQUEST_ENABLE_BT);
                 }
             }
+            else {
+                Toast.makeText(this, R.string.bt_not_supported, Toast.LENGTH_LONG).show();
+            }
         }
 
     }
 
-    @Override
     public void onDestroy() {
         super.onDestroy();
         mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
@@ -181,10 +189,19 @@ public class SimulationActivity extends AppCompatActivity {
                 BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
                 if (mBluetoothAdapter != null) {
                     mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
-                    startAdvertising();
+                    if (mBluetoothLeAdvertiser != null) {
+                        startAdvertising();
+                    }
+                    else {
+                        Toast.makeText(this, getString(R.string.bt_ads_not_supported), Toast.LENGTH_LONG).show();
+
+                    }
                 } else {
+                    Toast.makeText(this, getString(R.string.bt_null), Toast.LENGTH_LONG).show();
                 }
             } else {
+                Toast.makeText(this, "Error: Bluetooth object null", Toast.LENGTH_LONG).show();
+
             }
         }
     }
@@ -195,11 +212,8 @@ public class SimulationActivity extends AppCompatActivity {
         switch (requestCode) {
             case Constants.REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
-                    if (bluetoothAdapter.isMultipleAdvertisementSupported()) {
-                        bluetoothAdapter.setName(Constants.LOCAL_NAME);
-                        initialize();
-
-                    }
+                    bluetoothAdapter.setName(Constants.LOCAL_NAME);
+                    initialize();
                 }
         }
     }
@@ -220,9 +234,6 @@ public class SimulationActivity extends AppCompatActivity {
     }
 
     private void startAdvertising() {
-//        Intent intent = getServiceIntent(this);
-//        intent.getExtras();
-//        startService(getServiceIntent(this));
         if (mAdvertiseCallback == null) {
             AdvertiseSettings settings = buildAdvertiseSettings();
             AdvertiseData data = buildAdvertiseData();
