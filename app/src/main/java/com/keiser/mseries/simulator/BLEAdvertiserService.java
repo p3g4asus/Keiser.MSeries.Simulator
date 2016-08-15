@@ -1,4 +1,4 @@
-package com.keiser.mseries.mseriessimulator;
+package com.keiser.mseries.simulator;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -13,9 +13,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-/**
- * Created by keiser on 8/12/16.
- */
 public class BLEAdvertiserService extends Service {
     private static final String TAG = BLEAdvertiserService.class.getSimpleName();
 
@@ -37,7 +34,6 @@ public class BLEAdvertiserService extends Service {
     private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
 
     private AdvertiseCallback mAdvertiseCallback;
-
 
 
     @Override
@@ -132,7 +128,7 @@ public class BLEAdvertiserService extends Service {
 
         AdvertiseData.Builder dataBuilder = new AdvertiseData.Builder();
         dataBuilder.setIncludeDeviceName(true);
-        dataBuilder.addManufacturerData(3, new byte[] {0x06, 0x30,0x00,0x01,0x38,0x03,0x46,0x05,0x73,0x00,0x0D,0x00,0x04,0x27,0x01,0x00,0x0A});
+        dataBuilder.addManufacturerData(3, new byte[]{0x06, 0x30, 0x00, 0x01, 0x38, 0x03, 0x46, 0x05, 0x73, 0x00, 0x0D, 0x00, 0x04, 0x27, 0x01, 0x00, 0x0A});
 
         /* For example - this will cause advertising to fail (exceeds size limit) */
         //String failureData = "asdghkajsghalkxcjhfa;sghtalksjcfhalskfjhasldkjfhdskf";
@@ -180,7 +176,7 @@ public class BLEAdvertiserService extends Service {
      * Builds and sends a broadcast intent indicating Advertising has failed. Includes the error
      * code as an extra. This is intended to be picked up by the {@code AdvertiserFragment}.
      */
-    private void sendFailureIntent(int errorCode){
+    private void sendFailureIntent(int errorCode) {
         Intent failureIntent = new Intent();
         failureIntent.setAction(ADVERTISING_FAILED);
         failureIntent.putExtra(ADVERTISING_FAILED_EXTRA_CODE, errorCode);
