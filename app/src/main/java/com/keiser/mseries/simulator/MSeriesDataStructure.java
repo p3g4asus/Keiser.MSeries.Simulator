@@ -15,13 +15,19 @@ public class MSeriesDataStructure {
     private byte seconds = 0x27;
     private byte[] trip = {0x01, 0x00};
 
-    public MSeriesDataStructure(byte currentBuildMajor, byte currentBuildMinor, byte currentBikeID, byte[] currentRPM, byte currentGear, byte[] currentPower) {
+    public MSeriesDataStructure(byte currentBuildMajor, int currentBuildMinor, byte currentBikeID, byte[] currentRPM, byte currentGear, byte[] currentPower) {
         buildMajor = currentBuildMajor;
-        buildMinor = currentBuildMinor;
+        buildMinor = convertIntToByte(currentBuildMinor);
         bikeID = currentBikeID;
         rpm = currentRPM;
         gear = currentGear;
         power = currentPower;
+    }
+
+    private byte convertIntToByte(int value)
+    {
+        int newValue = value/10*16 + (value % 10);
+        return (byte)newValue;
     }
 
     public byte[] data() {

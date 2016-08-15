@@ -58,7 +58,7 @@ public class SimulationActivity extends AppCompatActivity {
         String buildMajor = buildMajorSplitItems[0];
         String buildMinor = buildMajorSplitItems[1];
         byte build = Byte.parseByte(buildMajor);
-        byte minor = Byte.parseByte(buildMinor);
+        int minor = Integer.parseInt(buildMinor);
 
         SeekBar gearSeekBar = (SeekBar)findViewById(R.id.gearSeekBar);
         gearSeekBar.setMax(24);
@@ -277,7 +277,7 @@ public class SimulationActivity extends AppCompatActivity {
 
         AdvertiseData.Builder dataBuilder = new AdvertiseData.Builder();
         dataBuilder.setIncludeDeviceName(true);
-        dataBuilder.addManufacturerData(3, simulatedData.data());
+        dataBuilder.addManufacturerData(258, simulatedData.data());
 
         /* For example - this will cause advertising to fail (exceeds size limit) */
         //String failureData = "asdghkajsghalkxcjhfa;sghtalksjcfhalskfjhasldkjfhdskf";
