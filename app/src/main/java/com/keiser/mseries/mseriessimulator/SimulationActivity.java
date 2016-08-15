@@ -61,7 +61,7 @@ public class SimulationActivity extends AppCompatActivity {
         byte minor = Byte.parseByte(buildMinor);
 
         SeekBar gearSeekBar = (SeekBar)findViewById(R.id.gearSeekBar);
-        gearSeekBar.setMax(255);
+        gearSeekBar.setMax(24);
         gearSeekBar.setProgress(10);
         gearSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -87,13 +87,13 @@ public class SimulationActivity extends AppCompatActivity {
         });
 
         SeekBar rpmSeekBar = (SeekBar)findViewById(R.id.rpmSeekBar);
-        rpmSeekBar.setMax(1000);
-        rpmSeekBar.setProgress(824);
+        rpmSeekBar.setMax(800);
+        rpmSeekBar.setProgress(400);
         rpmSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 TextView rpmTextView = (TextView)findViewById(R.id.rpmTextView);
-                rpmTextView.setText(String.valueOf(Math.ceil(i/10.0)));
+                rpmTextView.setText(String.valueOf(Math.ceil((i+400)/10.0)));
             }
 
             @Override
@@ -104,13 +104,13 @@ public class SimulationActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
-                simulatedData.rpm = convertRPMToBytes(seekBar.getProgress());
+                simulatedData.rpm = convertRPMToBytes(seekBar.getProgress()+400);
                 mAdvertiseCallback = null;
                 startAdvertising();
             }
         });
 
-        simulatedData = new KeiserDataStructure(build, minor,bikeID,convertRPMToBytes(rpmSeekBar.getProgress()),(byte)gearSeekBar.getProgress());
+        simulatedData = new KeiserDataStructure(build, minor,bikeID,convertRPMToBytes(rpmSeekBar.getProgress()+400),(byte)gearSeekBar.getProgress());
 
         TextView buildNumberTextView = (TextView)findViewById(R.id.buildNumberTextView);
         buildNumberTextView.setText(buildString);
@@ -122,7 +122,7 @@ public class SimulationActivity extends AppCompatActivity {
         gearTextView.setText(String.valueOf(gearSeekBar.getProgress()));
 
         TextView rpmTextView = (TextView)findViewById(R.id.rpmTextView);
-        rpmTextView.setText(String.valueOf(Math.ceil(rpmSeekBar.getProgress()/10)));
+        rpmTextView.setText(String.valueOf(Math.ceil((rpmSeekBar.getProgress()+400)/10)));
 
 
 
