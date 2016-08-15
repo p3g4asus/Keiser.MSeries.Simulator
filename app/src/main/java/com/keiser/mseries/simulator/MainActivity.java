@@ -1,4 +1,4 @@
-package com.keiser.mseries.mseriessimulator;
+package com.keiser.mseries.simulator;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner buildMajorSpinner = (Spinner)findViewById(R.id.buildMajorSpinner);
+        Spinner buildMajorSpinner = (Spinner) findViewById(R.id.buildMajorSpinner);
 
         ArrayAdapter<CharSequence> buildMajorArray = ArrayAdapter.createFromResource(this,
                 R.array.build_majors_array, android.R.layout.simple_spinner_item);
@@ -26,13 +26,13 @@ public class MainActivity extends AppCompatActivity {
         buildMajorSpinner.setAdapter(buildMajorArray);
 
         ArrayList<String> bikeIDArray = new ArrayList<>();
-        for (int i=1; i <=100;i++)  {
+        for (int i = 1; i <= 100; i++) {
             bikeIDArray.add(Integer.toString(i));
         }
 
-        Spinner bikeIDSpinner = (Spinner)findViewById(R.id.bikeIDSpinner);
+        Spinner bikeIDSpinner = (Spinner) findViewById(R.id.bikeIDSpinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                 android.R.layout.simple_spinner_item, bikeIDArray);
+                android.R.layout.simple_spinner_item, bikeIDArray);
 // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
@@ -41,12 +41,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSimulateButtonClicked(View v) {
-        Spinner buildMajorSpinner = (Spinner)findViewById(R.id.buildMajorSpinner);
+        Spinner buildMajorSpinner = (Spinner) findViewById(R.id.buildMajorSpinner);
         String buildItem = (String) buildMajorSpinner.getSelectedItem();
 
-        Spinner bikeIDSpinner = (Spinner)findViewById(R.id.bikeIDSpinner);
+        Spinner bikeIDSpinner = (Spinner) findViewById(R.id.bikeIDSpinner);
         String bikeItem = (String) bikeIDSpinner.getSelectedItem();
-        Intent intent = new Intent(this,SimulationActivity.class);
+        Intent intent = new Intent(this, SimulationActivity.class);
         intent.putExtra("BuildMajor", buildItem);
         intent.putExtra("BikeID", bikeItem);
         startActivity(intent);

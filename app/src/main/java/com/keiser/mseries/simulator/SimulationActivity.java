@@ -1,4 +1,4 @@
-package com.keiser.mseries.mseriessimulator;
+package com.keiser.mseries.simulator;
 
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
@@ -14,8 +14,6 @@ import android.bluetooth.BluetoothManager;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.nio.ByteBuffer;
 
@@ -42,7 +40,7 @@ public class SimulationActivity extends AppCompatActivity {
     private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
 
     private BroadcastReceiver advertisingFailureReceiver;
-    private KeiserDataStructure simulatedData;
+    private MSeriesDataStructure simulatedData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,20 +51,20 @@ public class SimulationActivity extends AppCompatActivity {
         Intent intent = getIntent();
         byte bikeID = Byte.parseByte(intent.getStringExtra("BikeID"));
 
-        String buildString= intent.getStringExtra("BuildMajor");
+        String buildString = intent.getStringExtra("BuildMajor");
         String[] buildMajorSplitItems = buildString.split("\\.");
         String buildMajor = buildMajorSplitItems[0];
         String buildMinor = buildMajorSplitItems[1];
         byte build = Byte.parseByte(buildMajor);
         byte minor = Byte.parseByte(buildMinor);
 
-        SeekBar gearSeekBar = (SeekBar)findViewById(R.id.gearSeekBar);
+        SeekBar gearSeekBar = (SeekBar) findViewById(R.id.gearSeekBar);
         gearSeekBar.setMax(255);
         gearSeekBar.setProgress(10);
         gearSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                TextView gearTextView = (TextView)findViewById(R.id.gearTextView);
+                TextView gearTextView = (TextView) findViewById(R.id.gearTextView);
                 gearTextView.setText(String.valueOf(i));
             }
 
@@ -78,22 +76,22 @@ public class SimulationActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
-                simulatedData.gear = (byte)(seekBar.getProgress());
-                TextView gearTextView = (TextView)findViewById(R.id.gearTextView);
+                simulatedData.gear = (byte) (seekBar.getProgress());
+                TextView gearTextView = (TextView) findViewById(R.id.gearTextView);
                 gearTextView.setText(String.valueOf(seekBar.getProgress()));
                 mAdvertiseCallback = null;
                 startAdvertising();
             }
         });
 
-        SeekBar rpmSeekBar = (SeekBar)findViewById(R.id.rpmSeekBar);
+        SeekBar rpmSeekBar = (SeekBar) findViewById(R.id.rpmSeekBar);
         rpmSeekBar.setMax(1000);
         rpmSeekBar.setProgress(824);
         rpmSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                TextView rpmTextView = (TextView)findViewById(R.id.rpmTextView);
-                rpmTextView.setText(String.valueOf(Math.ceil(i/10.0)));
+                TextView rpmTextView = (TextView) findViewById(R.id.rpmTextView);
+                rpmTextView.setText(String.valueOf(Math.ceil(i / 10.0)));
             }
 
             @Override
@@ -110,20 +108,19 @@ public class SimulationActivity extends AppCompatActivity {
             }
         });
 
-        simulatedData = new KeiserDataStructure(build, minor,bikeID,convertRPMToBytes(rpmSeekBar.getProgress()),(byte)gearSeekBar.getProgress());
+        simulatedData = new MSeriesDataStructure(build, minor, bikeID, convertRPMToBytes(rpmSeekBar.getProgress()), (byte) gearSeekBar.getProgress());
 
-        TextView buildNumberTextView = (TextView)findViewById(R.id.buildNumberTextView);
+        TextView buildNumberTextView = (TextView) findViewById(R.id.buildNumberTextView);
         buildNumberTextView.setText(buildString);
 
-        TextView bikeIDTextView = (TextView)findViewById(R.id.bikeIDTextView);
+        TextView bikeIDTextView = (TextView) findViewById(R.id.bikeIDTextView);
         bikeIDTextView.setText(intent.getStringExtra("BikeID"));
 
-        TextView gearTextView = (TextView)findViewById(R.id.gearTextView);
+        TextView gearTextView = (TextView) findViewById(R.id.gearTextView);
         gearTextView.setText(String.valueOf(gearSeekBar.getProgress()));
 
-        TextView rpmTextView = (TextView)findViewById(R.id.rpmTextView);
-        rpmTextView.setText(String.valueOf(Math.ceil(rpmSeekBar.getProgress()/10)));
-
+        TextView rpmTextView = (TextView) findViewById(R.id.rpmTextView);
+        rpmTextView.setText(String.valueOf(Math.ceil(rpmSeekBar.getProgress() / 10)));
 
 
         advertisingFailureReceiver = new BroadcastReceiver() {
@@ -157,13 +154,12 @@ public class SimulationActivity extends AppCompatActivity {
             bluetoothAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
 
             if (bluetoothAdapter != null) {
-                if (bluetoothAdapter.isEnabled()){
+                if (bluetoothAdapter.isEnabled()) {
                     if (bluetoothAdapter.isMultipleAdvertisementSupported()) {
                         bluetoothAdapter.setName(Constants.LOCAL_NAME);
                         initialize();
                     }
-                }
-                else {
+                } else {
                     Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBluetoothIntent, Constants.REQUEST_ENABLE_BT);
                 }
@@ -177,6 +173,7 @@ public class SimulationActivity extends AppCompatActivity {
         super.onDestroy();
         mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
     }
+
     private void initialize() {
         if (mBluetoothLeAdvertiser == null) {
             BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -195,10 +192,10 @@ public class SimulationActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case Constants.REQUEST_ENABLE_BT:
-                if (resultCode == RESULT_OK){
-                    if (bluetoothAdapter.isMultipleAdvertisementSupported()){
+                if (resultCode == RESULT_OK) {
+                    if (bluetoothAdapter.isMultipleAdvertisementSupported()) {
                         bluetoothAdapter.setName(Constants.LOCAL_NAME);
                         initialize();
 
@@ -219,7 +216,7 @@ public class SimulationActivity extends AppCompatActivity {
         bb.putInt(currentRPM);
         byte[] results = bb.array();
 
-        return new byte[] {results[3], results[2]};
+        return new byte[]{results[3], results[2]};
     }
 
     private void startAdvertising() {
@@ -302,7 +299,7 @@ public class SimulationActivity extends AppCompatActivity {
      * Builds and sends a broadcast intent indicating Advertising has failed. Includes the error
      * code as an extra. This is intended to be picked up by the {@code AdvertiserFragment}.
      */
-    private void sendFailureIntent(int errorCode){
+    private void sendFailureIntent(int errorCode) {
         Intent failureIntent = new Intent();
         failureIntent.setAction(ADVERTISING_FAILED);
         failureIntent.putExtra(ADVERTISING_FAILED_EXTRA_CODE, errorCode);
