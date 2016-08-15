@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="build_majors_array">
-        <item>6.3</item>
+        <item>6.30</item>
         <item>6.21</item>
         <item>6.0</item>
     </string-array>

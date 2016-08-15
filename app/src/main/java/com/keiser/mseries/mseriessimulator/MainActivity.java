@@ -41,7 +41,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSimulateButtonClicked(View v) {
+        Spinner buildMajorSpinner = (Spinner)findViewById(R.id.buildMajorSpinner);
+        String buildItem = (String) buildMajorSpinner.getSelectedItem();
+
+        Spinner bikeIDSpinner = (Spinner)findViewById(R.id.bikeIDSpinner);
+        String bikeItem = (String) bikeIDSpinner.getSelectedItem();
         Intent intent = new Intent(this,SimulationActivity.class);
+        intent.putExtra("BuildMajor", buildItem);
+        intent.putExtra("BikeID", bikeItem);
         startActivity(intent);
     }
 }
