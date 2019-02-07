@@ -117,7 +117,7 @@ public class SimulationActivity extends AppCompatActivity {
         int defaultRPM = rpmSeekBar.getProgress()+400;
         int defaultGear = gearSeekBar.getProgress();
 
-        simulatedData = new MSeriesDataStructure(build, minor,bikeID,convertIntToTwoBytes(defaultRPM),(byte)defaultGear, calculatePower(defaultGear, defaultRPM));
+        simulatedData = new MSeriesDataStructure(build, minor,bikeID,convertIntToTwoBytes(defaultRPM),(byte)defaultGear, calculatePower(defaultGear, defaultRPM-400));
 
         TextView buildNumberTextView = (TextView) findViewById(R.id.buildNumberTextView);
         buildNumberTextView.setText(buildString);
