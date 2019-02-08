@@ -45,23 +45,6 @@ public class SimulationActivity extends AppCompatActivity {
 
     private BroadcastReceiver advertisingFailureReceiver;
     private MSeriesDataStructure simulatedData;
-    private Timer timeTimer = null;
-    private IncTimeTask timeTask = null;
-
-    private class IncTimeTask extends TimerTask {
-        short time = 0;
-        @Override
-        public void run() {
-            time+=1;
-            if (simulatedData!=null) {
-                simulatedData.time = time;
-            }
-        }
-        public short getTime() {
-            return time;
-        }
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +53,6 @@ public class SimulationActivity extends AppCompatActivity {
         setTitle("Simulation");
 
         Intent intent = getIntent();
-        timeTimer = new Timer();
-        timeTask = new IncTimeTask();
-        timeTimer.schedule(timeTask,1000,1000);
         byte bikeID = Byte.parseByte(intent.getStringExtra("BikeID"));
 
         String buildString = intent.getStringExtra("BuildMajor");
