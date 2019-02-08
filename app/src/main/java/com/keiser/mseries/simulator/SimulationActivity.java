@@ -18,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.nio.ByteBuffer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SimulationActivity extends AppCompatActivity {
@@ -43,6 +45,23 @@ public class SimulationActivity extends AppCompatActivity {
 
     private BroadcastReceiver advertisingFailureReceiver;
     private MSeriesDataStructure simulatedData;
+    private Timer timeTimer = null;
+    private IncTimeTask timeTask = null;
+
+    private class IncTimeTask extends TimerTask {
+        short time = 0;
+        @Override
+        public void run() {
+            time+=1;
+            if (simulatedData!=null) {
+                simulatedData.time = time;
+            }
+        }
+        public short getTime() {
+            return time;
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +70,9 @@ public class SimulationActivity extends AppCompatActivity {
         setTitle("Simulation");
 
         Intent intent = getIntent();
+        timeTimer = new Timer();
+        timeTask = new IncTimeTask();
+        timeTimer.schedule(timeTask,1000,1000);
         byte bikeID = Byte.parseByte(intent.getStringExtra("BikeID"));
 
         String buildString = intent.getStringExtra("BuildMajor");
@@ -80,7 +102,7 @@ public class SimulationActivity extends AppCompatActivity {
                 mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
                 simulatedData.gear = (byte) (seekBar.getProgress());
                 SeekBar rpmSeekBar = (SeekBar)findViewById(R.id.rpmSeekBar);
-                simulatedData.power = calculatePower(seekBar.getProgress(),rpmSeekBar.getProgress());
+                simulatedData.setPower(calculatePower(seekBar.getProgress(),rpmSeekBar.getProgress()));
                 TextView gearTextView = (TextView) findViewById(R.id.gearTextView);
                 gearTextView.setText(String.valueOf(seekBar.getProgress()));
                 mAdvertiseCallback = null;
@@ -106,9 +128,9 @@ public class SimulationActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
-                simulatedData.rpm = convertIntToTwoBytes(seekBar.getProgress()+400);
+                simulatedData.setRpm(convertIntToTwoBytes(seekBar.getProgress()+400));
                 SeekBar gearSeekBar = (SeekBar)findViewById(R.id.gearSeekBar);
-                simulatedData.power = calculatePower(gearSeekBar.getProgress(), seekBar.getProgress());
+                simulatedData.setPower(calculatePower(gearSeekBar.getProgress(), seekBar.getProgress()));
                 mAdvertiseCallback = null;
                 startAdvertising();
             }
